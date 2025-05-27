@@ -46,12 +46,23 @@ function App() {
                 <ul>
                     {characters.map((character) => (
                         <li key={character.id}>
-                            <div>
+                            <div className="image-container">
                                 <img src={character.imagem} alt={character.nome} className="character-image" />
                             </div>
-                            {character.nome} - {character.origem} - {character.habilidades}
-                            <button onClick={() => setEditingCharacter(character)}>Editar</button>
-                            <button onClick={() => handleDelete(character.id)}>Deletar</button>
+                            <div className="info-container">
+                                <span>Nome</span>
+                                <div className="info-box name">
+                                    {character.nome}
+                                </div>
+                                <span>Origem</span>
+                                <div className="info-box origin">{character.origem}</div>
+                                <span>Habilidades</span>
+                                <div className="info-box skills">{character.habilidades}</div>
+                            </div>
+                            <div className="buttons">
+                                <button onClick={() => setEditingCharacter(character)}>Editar</button>
+                                <button onClick={() => handleDelete(character.id)}>Deletar</button>
+                            </div>
                         </li>
                     ))}
                 </ul>
