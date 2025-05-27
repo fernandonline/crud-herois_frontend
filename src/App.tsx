@@ -1,34 +1,29 @@
-import { useEffect, useState } from 'react';
-import CharacterForm from './components/CharacterForm';
-import { fetchSavedCharacters, deleteCharacter } from './services/api';
-import './App.css';
+import { useEffect, useState } from 'react'
+import CharacterForm from './components/CharacterForm'
+import { useSelector, useDispatch } from 'react-redux'
+import type { RootState, AppDispatch } from './store/store';
+import { loadCharacters, deleteCharacter } from './store/charactersSlice'
+import './App.css'
 
 function App() {
-    const [characters, setCharacters] = useState<{ id: string; imagem: string; nome: string; origem: string; habilidades: string }[] > ([])
-    const [loading, setLoading] = useState(true);
-    const [editingCharacter, setEditingCharacter] = useState<{ id: string; imagem: string; nome: string; origem: string; habilidades: string } | undefined > (undefined)
-
-
-    const loadCharacters = async () => {
-        setLoading(true);
-        const savedCharacters = await fetchSavedCharacters();
-        setCharacters(savedCharacters);
-        setLoading(false);
-    };
+    const dispatch = useDispatch<AppDispatch>()
+    const { characters, loading, error } = useSelector((state: RootState) => state.characters)
+    const [editingCharacter, setEditingCharacter] = useState<
+        { id: string; imagem: string; nome: string; origem: string; habilidades: string } | undefined
+    >(undefined)
 
     useEffect(() => {
-        loadCharacters();
-    }, []);
+        dispatch(loadCharacters())
+    }, [dispatch])
 
     const handleDelete = async (id: string) => {
-        const result = await deleteCharacter(id);
-        if (result.success) {
-            alert(result.message || 'Herói deletado');
-            loadCharacters();
-        } else {
-            alert(result.message || 'Erro ao deletar herói');
+        try {
+            await dispatch(deleteCharacter(id)).unwrap()
+            alert('Herói deletado com sucesso')
+        } catch (err: any) {
+            alert(err.message || 'Erro ao deletar herói')
         }
-    };
+    }
 
     return (
         <div>
@@ -36,13 +31,13 @@ function App() {
             <CharacterForm
                 character={editingCharacter}
                 onSuccess={() => {
-                    setEditingCharacter(undefined);
-                    loadCharacters();
+                    setEditingCharacter(undefined)
+                    dispatch(loadCharacters())
                 }}
             />
-            {loading ? (
-                <div>Carregando...</div>
-            ) : (
+            {loading && <div>Carregando...</div>}
+            {error && <div style={{ color: 'red' }}>{error}</div>}
+            {!loading && !error && (
                 <ul>
                     {characters.map((character) => (
                         <li key={character.id}>
@@ -51,9 +46,7 @@ function App() {
                             </div>
                             <div className="info-container">
                                 <span>Nome</span>
-                                <div className="info-box name">
-                                    {character.nome}
-                                </div>
+                                <div className="info-box name">{character.nome}</div>
                                 <span>Origem</span>
                                 <div className="info-box origin">{character.origem}</div>
                                 <span>Habilidades</span>
@@ -68,7 +61,7 @@ function App() {
                 </ul>
             )}
         </div>
-    );
+    )
 }
 
-export default App;
+export default App
