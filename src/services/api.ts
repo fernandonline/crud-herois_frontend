@@ -1,19 +1,9 @@
 import md5 from "md5";
 
-const PUBLIC_KEY = '9ab2487c5ec2aed25a742b5f43231f9a'
-const PRIVATE_KEY = 'e2ace0a822154ba6694cf0913a0bcce5ab80e3fd'
-const MARVEL_BASE_URL = 'https://gateway.marvel.com/v1/public';
-const API_BASE_URL = 'https://crud-heroisbackend.onrender.com';
-
-const nameTranslations: { [key: string]: string } = {
-    'Homem-Aranha': 'Spider-Man',
-    'Homem de Ferro': 'Iron Man',
-    'Capit鉶 Am閞ica': 'Captain America',
-    'Hulk': 'Hulk',
-    'Thor': 'Thor',
-    'Vi鷙a Negra': 'Black Widow',
-    'Pantera Negra': 'Black Panther',
-};
+const PUBLIC_KEY = import.meta.env.VITE_PUBLIC_KEY;
+const PRIVATE_KEY = import.meta.env.VITE_PRIVATE_KEY;
+const MARVEL_BASE_URL = import.meta.env.VITE_MARVEL_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const getAuthParams = () => {
     const ts = Date.now().toString();
@@ -23,12 +13,12 @@ const getAuthParams = () => {
 
 export const verifyCharacterName = async (name: string): Promise<boolean> => {
     try {
-        const marvelName = nameTranslations[name] || name;
-        console.log('Verificando nome:', name, '->', marvelName);
-        const encodedName = encodeURIComponent(marvelName);
+        const authParams = getAuthParams();
         const params = new URLSearchParams({
-            ...getAuthParams(),
-            name: encodedName,
+            ts: authParams.ts,
+            apikey: authParams.apikey || '',
+            hash: authParams.hash || '',
+            name: name,
         });
         const url = `${MARVEL_BASE_URL}/characters?${params}`;
         console.log('URL da Marvel:', url);
@@ -62,11 +52,11 @@ export const addCharacter = async (character: {
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Erro do backend:', errorData);
-            return { success: false, message: errorData.message.join(', ') || 'Erro ao adicionar her骾' };
+            return { success: false, message: errorData.message.join(', ') || 'Erro ao adicionar her贸i' };
         }
-        return { success: true, message: 'Her骾 salvo com sucesso' };
+        return { success: true, message: 'Her贸i salvo com sucesso' };
     } catch (error) {
-        console.error('Erro na requisi玢o:', error);
+        console.error('Erro na requisi莽茫o:', error);
         return { success: false, message: 'Erro ao conectar com a API' };
     }
 };
@@ -81,7 +71,7 @@ export const updateCharacter = async (
     }
 ): Promise<{ success: boolean; message?: string }> => {
     try {
-        console.log('Atualizando her骾:', id, character);
+        console.log('Atualizando her贸i:', id, character);
         const response = await fetch(`${API_BASE_URL}/heroes/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -90,29 +80,29 @@ export const updateCharacter = async (
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Erro do backend:', errorData);
-            return { success: false, message: errorData.message.join(', ') || 'Erro ao atualizar her骾' };
+            return { success: false, message: errorData.message.join(', ') || 'Erro ao atualizar her贸i' };
         }
-        return { success: true, message: 'Her骾 atualizado com sucesso' };
+        return { success: true, message: 'Her贸i atualizado com sucesso' };
     } catch (error) {
-        console.error('Erro na requisi玢o:', error);
+        console.error('Erro na requisi莽茫o:', error);
         return { success: false, message: 'Erro ao conectar com a API' };
     }
 };
 
 export const deleteCharacter = async (id: string): Promise<{ success: boolean; message?: string }> => {
     try {
-        console.log('Deletando her骾:', id);
+        console.log('Deletando her贸i:', id);
         const response = await fetch(`${API_BASE_URL}/heroes/${id}`, {
             method: 'DELETE',
         });
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Erro do backend:', errorData);
-            return { success: false, message: errorData.message || 'Erro ao deletar her骾' };
+            return { success: false, message: errorData.message || 'Erro ao deletar her贸i' };
         }
-        return { success: true, message: 'Her骾 deletado com sucesso' };
+        return { success: true, message: 'Her贸i deletado com sucesso' };
     } catch (error) {
-        console.error('Erro na requisi玢o:', error);
+        console.error('Erro na requisi莽茫o:', error);
         return { success: false, message: 'Erro ao conectar com a API' };
     }
 };
@@ -127,7 +117,7 @@ export const fetchSavedCharacters = async (): Promise<
         }
         return response.json();
     } catch (error) {
-        console.error('Erro ao buscar her骾s salvos:', error);
+        console.error('Erro ao buscar her贸is salvos:', error);
         return [];
     }
 };

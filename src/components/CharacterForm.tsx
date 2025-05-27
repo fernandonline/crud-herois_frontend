@@ -1,6 +1,6 @@
-// src/components/CharacterForm.tsx
 import { useState, useEffect } from 'react';
 import { verifyCharacterName, addCharacter, updateCharacter } from '../services/api';
+import './HeroForm.css';
 
 interface CharacterFormProps {
     character?: { id: string; imagem: string; nome: string; origem: string; habilidades: string };
@@ -35,7 +35,7 @@ function CharacterForm({ character, onSuccess }: CharacterFormProps) {
         const nameExists = await verifyCharacterName(nome);
         console.log('Nome existe?', nameExists);
         if (!nameExists) {
-            setError(`Herói "${nome}" não encontrado na API da Marvel`);
+            setError(`HerÃ³i "${nome}" nÃ£o encontrado na API da Marvel`);
             setIsSubmitting(false);
             return;
         }
@@ -49,33 +49,24 @@ function CharacterForm({ character, onSuccess }: CharacterFormProps) {
         setIsSubmitting(false);
 
         if (result.success) {
-            setSuccess(result.message || 'Operação realizada com sucesso');
+            setSuccess(result.message || 'OperaÃ§Ã£o realizada com sucesso');
             setNome('');
             setImagem('');
             setOrigem('');
             setHabilidades('');
             onSuccess();
         } else {
-            setError(result.message || 'Erro ao processar a operação');
+            setError(result.message || 'Erro ao processar a operaÃ§Ã£o');
         }
     };
 
     return (
-        <div>
-            <h2>{character ? 'Editar Herói' : 'Adicionar Herói'}</h2>
+        <div className="entry-area">
+            <h2>{character ? 'Editando HerÃ³i' : 'Adicionar HerÃ³i'}</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {success && <p style={{ color: 'green' }}>{success}</p>}
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nome (ex.: Spider-Man ou Homem-Aranha):</label>
-                    <input
-                        type="text"
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        placeholder="Ex.: Spider-Man"
-                        required
-                    />
-                </div>
+
+            <form className="hero-form" onSubmit={handleSubmit}>
                 <div>
                     <label>URL da Imagem:</label>
                     <input
@@ -87,12 +78,22 @@ function CharacterForm({ character, onSuccess }: CharacterFormProps) {
                     />
                 </div>
                 <div>
+                    <label>Nome em inglÃªs:</label>
+                    <input
+                        type="text"
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                        placeholder="Ex.: Spider-Man ou Hulk"
+                        required
+                    />
+                </div>
+                <div>
                     <label>Origem:</label>
                     <input
                         type="text"
                         value={origem}
                         onChange={(e) => setOrigem(e.target.value)}
-                        placeholder="Ex.: Nova York"
+                        placeholder="Ex.: Terra"
                         required
                     />
                 </div>
@@ -105,6 +106,7 @@ function CharacterForm({ character, onSuccess }: CharacterFormProps) {
                         required
                     />
                 </div>
+
                 <button type="submit" disabled={isSubmitting}>
                     {isSubmitting ? 'Enviando...' : character ? 'Atualizar' : 'Adicionar'}
                 </button>
